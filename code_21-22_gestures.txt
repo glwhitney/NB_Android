@@ -1,0 +1,140 @@
+[source code] Android Development Tutorial - Gestures
+
+***** manifest.xml
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.thenewboston.swiperdiaper">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
+
+***** MainActivity.java
+package com.thenewboston.swiperdiaper;
+
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.widget.TextView;
+import android.view.MotionEvent;
+import android.view.GestureDetector;
+import android.support.v4.view.GestureDetectorCompat;
+
+public class MainActivity extends AppCompatActivity implements GestureDetector.OnGestureListener,
+        GestureDetector.OnDoubleTapListener{
+
+    private TextView buckysMessage;
+    private GestureDetectorCompat gestureDetector;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        buckysMessage = (TextView)findViewById(R.id.buckysMessage);
+        this.gestureDetector = new GestureDetectorCompat(this,this);
+        gestureDetector.setOnDoubleTapListener(this);
+    }
+
+    //////////////// Begin Gestures ////////////////
+
+    @Override
+    public boolean onSingleTapConfirmed(MotionEvent e) {
+        buckysMessage.setText("onSingleTapConfirmed");
+        return true;
+    }
+
+    @Override
+    public boolean onDoubleTap(MotionEvent e) {
+        buckysMessage.setText("onDoubleTap");
+        return true;
+    }
+
+    @Override
+    public boolean onDoubleTapEvent(MotionEvent e) {
+        buckysMessage.setText("onDoubleTapEvent");
+        return true;
+    }
+
+    @Override
+    public boolean onDown(MotionEvent e) {
+        buckysMessage.setText("onDown");
+        return true;
+    }
+
+    @Override
+    public void onShowPress(MotionEvent e) {
+        buckysMessage.setText("onShowPress");
+    }
+
+    @Override
+    public boolean onSingleTapUp(MotionEvent e) {
+        buckysMessage.setText("onSingleTapUp");
+        return true;
+    }
+
+    @Override
+    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+        buckysMessage.setText("onScroll");
+        return true;
+    }
+
+    @Override
+    public void onLongPress(MotionEvent e) {
+        buckysMessage.setText("onLongPress");
+    }
+
+    @Override
+    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+        buckysMessage.setText("onFling");
+        return true;
+    }
+
+    //////////////// End Gestures ////////////////
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        this.gestureDetector.onTouchEvent(event);
+        return super.onTouchEvent(event);
+    }
+}
+
+***** activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.thenewboston.swiperdiaper.MainActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/buckys_text"
+        android:id="@+id/buckysMessage"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+</RelativeLayout>
+
+***** strings.xml
+<resources>
+    <string name="app_name">SwiperDiaper</string>
+    <string name="buckys_text">Gestures</string>
+</resources>

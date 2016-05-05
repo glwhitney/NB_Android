@@ -1,0 +1,603 @@
+[source code] Android Development Tutorial - Master Flow
+Not all of these were modified but they are here anyway.
+
+***** manifest.xml
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.thenewboston.masterflow">
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity
+            android:name=".WebpageListActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".WebpageDetailActivity"
+            android:label="@string/title_webpage_detail"
+            android:parentActivityName=".WebpageListActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.thenewboston.masterflow.WebpageListActivity" />
+        </activity>
+    </application>
+
+</manifest>
+
+***** DummyContent.java
+package com.thenewboston.masterflow.dummy;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Helper class for providing sample content for user interfaces created by
+ * Android template wizards.
+ * <p>
+ * TODO: Replace all uses of this class before publishing your app.
+ */
+public class DummyContent {
+
+    /**
+     * An array of sample (dummy) items.
+     */
+    public static final List<DummyItem> ITEMS = new ArrayList<DummyItem>();
+
+    /**
+     * A map of sample (dummy) items, by ID.
+     */
+    public static final Map<String, DummyItem> ITEM_MAP = new HashMap<String, DummyItem>();
+
+    private static final int COUNT = 25;
+
+    static {
+        // Add 3 sample items.
+        addItem(new DummyItem("1", "W3 Schools", "http://www.w3schools.com/"));
+        addItem(new DummyItem("2", "SQLite Tutorial", "http://www.vogella.com/tutorials/AndroidSQLite/article.html"));
+        addItem(new DummyItem("3", "Developer Tutorials", "http://developer.android.com/training/index.html"));
+    }
+
+    private static void addItem(DummyItem item) {
+        ITEMS.add(item);
+        ITEM_MAP.put(item.id, item);
+    }
+
+    private static DummyItem createDummyItem(int position) {
+        return new DummyItem(String.valueOf(position), "Item " + position, makeDetails(position));
+    }
+
+    private static String makeDetails(int position) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Details about Item: ").append(position);
+        for (int i = 0; i < position; i++) {
+            builder.append("\nMore details information here.");
+        }
+        return builder.toString();
+    }
+
+    /**
+     * A dummy item representing a piece of content.
+     */
+    public static class DummyItem {
+        public final String id;
+        public final String item_name;
+        public final String url;
+
+        public DummyItem(String id, String item_name, String url) {
+            this.id = id;
+            this.item_name = item_name;
+            this.url= url;
+        }
+
+        @Override
+        public String toString() {
+            return item_name;
+        }
+    }
+}
+
+***** WebpageDetailActivity.java (used if on phone)
+package com.thenewboston.masterflow;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.ActionBar;
+import android.support.v4.app.NavUtils;
+import android.view.MenuItem;
+
+/**
+ * An activity representing a single Webpage detail screen. This
+ * activity is only used narrow width devices. On tablet-size devices,
+ * item details are presented side-by-side with a list of items
+ * in a {@link WebpageListActivity}.
+ */
+public class WebpageDetailActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_webpage_detail);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
+        setSupportActionBar(toolbar);
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own detail action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
+
+        // Show the Up button in the action bar.
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
+        // savedInstanceState is non-null when there is fragment state
+        // saved from previous configurations of this activity
+        // (e.g. when rotating the screen from portrait to landscape).
+        // In this case, the fragment will automatically be re-added
+        // to its container so we don't need to manually add it.
+        // For more information, see the Fragments API guide at:
+        //
+        // http://developer.android.com/guide/components/fragments.html
+        //
+        if (savedInstanceState == null) {
+            // Create the detail fragment and add it to the activity
+            // using a fragment transaction.
+            Bundle arguments = new Bundle();
+            arguments.putString(WebpageDetailFragment.ARG_ITEM_ID,
+                    getIntent().getStringExtra(WebpageDetailFragment.ARG_ITEM_ID));
+            WebpageDetailFragment fragment = new WebpageDetailFragment();
+            fragment.setArguments(arguments);
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.webpage_detail_container, fragment)
+                    .commit();
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            // This ID represents the Home or Up button. In the case of this
+            // activity, the Up button is shown. Use NavUtils to allow users
+            // to navigate up one level in the application structure. For
+            // more details, see the Navigation pattern on Android Design:
+            //
+            // http://developer.android.com/design/patterns/navigation.html#up-vs-back
+            //
+            NavUtils.navigateUpTo(this, new Intent(this, WebpageListActivity.class));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+}
+
+***** WebpageDetailFragment.java (used if on tablet)
+package com.thenewboston.masterflow;
+
+import android.app.Activity;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.webkit.WebView;
+
+import com.thenewboston.masterflow.dummy.DummyContent;
+
+/**
+ * A fragment representing a single Webpage detail screen.
+ * This fragment is either contained in a {@link WebpageListActivity}
+ * in two-pane mode (on tablets) or a {@link WebpageDetailActivity}
+ * on handsets.
+ */
+public class WebpageDetailFragment extends Fragment {
+    /**
+     * The fragment argument representing the item ID that this fragment
+     * represents.
+     */
+    public static final String ARG_ITEM_ID = "item_id";
+
+    /**
+     * The dummy content this fragment is presenting.
+     */
+    private DummyContent.DummyItem mItem;
+
+    /**
+     * Mandatory empty constructor for the fragment manager to instantiate the
+     * fragment (e.g. upon screen orientation changes).
+     */
+    public WebpageDetailFragment() {
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (getArguments().containsKey(ARG_ITEM_ID)) {
+            // Load the dummy content specified by the fragment
+            // arguments. In a real-world scenario, use a Loader
+            // to load content from a content provider.
+            mItem = DummyContent.ITEM_MAP.get(getArguments().getString(ARG_ITEM_ID));
+
+            Activity activity = this.getActivity();
+            CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
+            if (appBarLayout != null) {
+                appBarLayout.setTitle(mItem.item_name);
+            }
+        }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.webpage_detail, container, false);
+
+        // Show the dummy content as text in a TextView.
+        if (mItem != null) {
+            ((WebView) rootView.findViewById(R.id.detail_area)).loadUrl(mItem.url);
+        }
+
+        return rootView;
+    }
+}
+
+***** WebpageListActivity.java (MainActivity)
+package com.thenewboston.masterflow;
+
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+
+import com.thenewboston.masterflow.dummy.DummyContent;
+
+import java.util.List;
+
+/**
+ * An activity representing a list of Webpages. This activity
+ * has different presentations for handset and tablet-size devices. On
+ * handsets, the activity presents a list of items, which when touched,
+ * lead to a {@link WebpageDetailActivity} representing
+ * item details. On tablets, the activity presents the list of items and
+ * item details side-by-side using two vertical panes.
+ */
+public class WebpageListActivity extends AppCompatActivity {
+
+    /**
+     * Whether or not the activity is in two-pane mode, i.e. running on a tablet
+     * device.
+     */
+    private boolean mTwoPane;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_webpage_list);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setTitle(getTitle());
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
+
+        View recyclerView = findViewById(R.id.webpage_list);
+        assert recyclerView != null;
+        setupRecyclerView((RecyclerView) recyclerView);
+
+        if (findViewById(R.id.webpage_detail_container) != null) {
+            // The detail container view will be present only in the
+            // large-screen layouts (res/values-w900dp).
+            // If this view is present, then the
+            // activity should be in two-pane mode.
+            mTwoPane = true;
+        }
+    }
+
+    private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
+        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(DummyContent.ITEMS));
+    }
+
+    public class SimpleItemRecyclerViewAdapter
+            extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
+
+        private final List<DummyContent.DummyItem> mValues;
+
+        public SimpleItemRecyclerViewAdapter(List<DummyContent.DummyItem> items) {
+            mValues = items;
+        }
+
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.webpage_list_content, parent, false);
+            return new ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(final ViewHolder holder, int position) {
+            holder.mItem = mValues.get(position);
+            holder.mIdView.setText(mValues.get(position).id);
+            holder.mContentView.setText(mValues.get(position).item_name);
+
+            holder.mView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mTwoPane) {
+                        Bundle arguments = new Bundle();
+                        arguments.putString(WebpageDetailFragment.ARG_ITEM_ID, holder.mItem.id);
+                        WebpageDetailFragment fragment = new WebpageDetailFragment();
+                        fragment.setArguments(arguments);
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.webpage_detail_container, fragment)
+                                .commit();
+                    } else {
+                        Context context = v.getContext();
+                        Intent intent = new Intent(context, WebpageDetailActivity.class);
+                        intent.putExtra(WebpageDetailFragment.ARG_ITEM_ID, holder.mItem.id);
+
+                        context.startActivity(intent);
+                    }
+                }
+            });
+        }
+
+        @Override
+        public int getItemCount() {
+            return mValues.size();
+        }
+
+        public class ViewHolder extends RecyclerView.ViewHolder {
+            public final View mView;
+            public final TextView mIdView;
+            public final TextView mContentView;
+            public DummyContent.DummyItem mItem;
+
+            public ViewHolder(View view) {
+                super(view);
+                mView = view;
+                mIdView = (TextView) view.findViewById(R.id.id);
+                mContentView = (TextView) view.findViewById(R.id.content);
+            }
+
+            @Override
+            public String toString() {
+                return super.toString() + " '" + mContentView.getText() + "'";
+            }
+        }
+    }
+}
+
+***** activiy_webpage_detail.xml
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context="com.thenewboston.masterflow.WebpageDetailActivity"
+    tools:ignore="MergeRootFrame">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/app_bar_height"
+        android:fitsSystemWindows="true"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/toolbar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
+            app:contentScrim="?attr/colorPrimary"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:toolbarId="@+id/toolbar">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/detail_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:layout_collapseMode="pin"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
+        </android.support.design.widget.CollapsingToolbarLayout>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/webpage_detail_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|start"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@android:drawable/stat_notify_chat"
+        app:layout_anchor="@+id/webpage_detail_container"
+        app:layout_anchorGravity="top|end" />
+
+</android.support.design.widget.CoordinatorLayout>
+
+***** activiy_webpage_list.xml  (activity_main)
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context=".WebpageListActivity">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+    </android.support.design.widget.AppBarLayout>
+
+    <FrameLayout
+        android:id="@+id/frameLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <include layout="@layout/webpage_list" />
+    </FrameLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@android:drawable/ic_dialog_email" />
+
+
+</android.support.design.widget.CoordinatorLayout>
+
+***** webpage_detail.xml
+<?xml version="1.0" encoding="utf-8"?>
+<WebView xmlns:android ="http://schemas.android.com/apk/res/android"
+    android:id="@+id/detail_area"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    />
+
+***** webpage_ list.xml
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/webpage_list"
+    android:name="com.thenewboston.masterflow.WebpageListFragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginLeft="16dp"
+    android:layout_marginRight="16dp"
+    app:layoutManager="LinearLayoutManager"
+    tools:context="com.thenewboston.masterflow.WebpageListActivity"
+    tools:listitem="@layout/webpage_list_content" />
+
+***** webpage_list_content.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/text_margin"
+        android:textAppearance="?attr/textAppearanceListItem" />
+
+    <TextView
+        android:id="@+id/content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/text_margin"
+        android:textAppearance="?attr/textAppearanceListItem" />
+</LinearLayout>
+
+***** webpage_list_twopane.xml (used if on tablet)
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginLeft="16dp"
+    android:layout_marginRight="16dp"
+    android:baselineAligned="false"
+    android:divider="?android:attr/dividerHorizontal"
+    android:orientation="horizontal"
+    android:showDividers="middle"
+    tools:context="com.thenewboston.masterflow.WebpageListActivity">
+
+    <!--
+    This layout is a two-pane layout for the Webpages
+    master/detail flow.
+    See res/values-large/refs.xml and
+    res/values-w900dp/refs.xml for an example of layout aliases
+    that replace the single-pane version of the layout with
+    this two-pane version.
+
+    For more on layout aliases, see:
+    http://developer.android.com/training/multiscreen/screensizes.html#TaskUseAliasFilters
+    -->
+
+    <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/webpage_list"
+        android:name="com.thenewboston.masterflow.WebpageListFragment"
+        android:layout_width="@dimen/item_width"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        app:layoutManager="LinearLayoutManager"
+        tools:context="com.thenewboston.masterflow.WebpageListActivity"
+        tools:listitem="@layout/webpage_list_content" />
+
+    <FrameLayout
+        android:id="@+id/webpage_detail_container"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="3" />
+
+</LinearLayout>
+
+***** strings.xml
