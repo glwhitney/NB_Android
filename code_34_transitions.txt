@@ -1,4 +1,27 @@
-[source code] Android Development Tutorial - Transitions
+[source code] Android Development Tutorial 34 - Transitions
+
+***** Tutorial Notes
+**34 - Animations and Transitions
+
+//Overview//
+The goal here is to make a button move from top-left to bottom right when you touch the screen.
+I started with an Empty Activity because I didn't need the overhead of the Basic Activity.
+
+//Tutorial//
+1. Start an Empty Activity, Don't choose Material Dark for your theme.
+	a. Give the layout and button Ids so you can reference them.
+2. MainActivity
+	a. Imports
+	b. Create layout viewGroup reference
+	c. Create the OnTouchListener()
+	d. Create the moveButton method
+		i. Change the layout rules for the button position
+		ii. Change the size rules for the button size
+	e. Button moved and changed in size but just appeared in the new location without a smooth transition
+		i. Add a transition manager, with default transition.
+
+NOTE: Bucky said he was going to teach Scenes in the next tutorial but he did not. If you want to know about this subject then I suggest buying the latest "Android Studio Development Essentials" eBook, by Neil Smyth.  You can get a version on Google Play but to get a PDF version I suggest eBookFrenzy.com
+
 
 ***** manifest.xml
 

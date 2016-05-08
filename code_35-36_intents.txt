@@ -1,0 +1,197 @@
+[source code] Android Development Tutorials 35 and 36 - Intents 
+
+***** Tutorial Notes
+//Overview//
+The goal is to have one activity display a different activity. You do this by sending a message to Android telling it what Activity you want. This is called an explicit intent. An implicit intent is where you State what ACTION you want and Android finds Apps registered to do that ACTION and passes along a Bundle with the Intent. You can use the Bundle to put data you want to provide to the APP. 
+If there is more than one APP registered to do that ACTION, Android will provide the user with choices, and a listening Activity can respond. You can pass parameters in the message. The message is called an Intent.
+
+NOTE: While not covered here, it is possible to have an Activity be a sub-Activity that can pass data back to the original Activity. In this tutorial we did not even assign an onClick to the second Activity.
+
+** 35 - Intents
+1. Start a new project with an Empty Activity.
+	a. Delete Hello World 
+	b. Change the background color to #009900 green
+	c. Add a TextView. change the text to Apples and give it the id applesText
+	d. Add a Button. change the text to "GO TO BACON", and give the id applesButton
+	e. Add the name of the onClick method to call.
+2. Create a new Empty Activity called Bacon, in your package without launch checked.
+	a. Background Color = #72231f
+	b. Add baconButton without an onClick attribute (unless you are going to write the onClick method in the java.
+
+
+** Tutorial 36 Extra Data
+The goal here is to send EXTRA_DATA with the intent and implement the onClick method we assigned to the Button onClick attribute.
+
+1. Apples.java
+	a. Import the Intent class and a TextView class.
+	b. Add onClick(View view) method
+		i. Create your new Intent, passing the current Activity context, and the class to launch.
+		ii. startActivity(IntentName)
+To pass some data with the intent we are going to add an EditText so the user can type something to be added.
+2. activity_apples.xml
+	a. Add a plain text, Text Field to be used as an input
+	b. Set the width to 250dp.
+	c. Give it the id applesInput
+3. Apple.java
+	a. Import the EditText
+	b. Get text value from user input.
+	c. Use the intent putExtra("name", value) to pass the user input with the Intent.
+4. Bacon.java – extract the message and update the TextView
+	a. Import TextView 
+	b. Add the Bundle appleData to onCreate
+	c. Test for data in the bundle
+		i. Create a string variable to hold the bundle data
+		ii. Update the TextView with the extra data.
+
+
+***** manifest.xml
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.thenewboston.intentexample">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".Apples">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".Bacon"></activity>
+    </application>
+
+</manifest>
+
+***** Apples.java
+package com.thenewboston.intentexample;
+
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.content.Intent;
+import android.view.View;
+import android.widget.EditText;
+
+public class Apples extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_apples);
+    }
+
+    public void onClick(View view){
+        Intent I = new Intent(this, Bacon.class);
+        // get user input
+        final EditText applesInput = (EditText) findViewById(R.id.applesInput);
+        String userMessage = applesInput.getText().toString();
+        // pass user input in the intent
+        I.putExtra("applesMessage", userMessage);
+
+        startActivity(I);
+    }
+}
+
+***** activity_apples.xml
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.thenewboston.intentexample.Apples"
+    android:background="#009900">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Apples"
+        android:id="@+id/applesText"
+        android:layout_marginTop="36dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="GO TO BACON"
+        android:id="@+id/applesButton"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:onClick="onClick" />
+
+    <EditText
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/applesInput"
+        android:layout_above="@+id/applesButton"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="45dp" />
+</RelativeLayout>
+
+***** Bacon.java
+package com.thenewboston.intentexample;
+
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.widget.TextView;
+
+public class Bacon extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_bacon);
+
+        Bundle applesData = getIntent().getExtras();
+        if (applesData== null){
+            return;
+        }
+        String applesMessage = applesData.getString("applesMessage");
+        TextView baconText = (TextView) findViewById(R.id.baconText);
+        baconText.setText(applesMessage);
+    }
+}
+
+***** activity_bacon.xml
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.thenewboston.intentexample.Bacon"
+    android:background="#72231f">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Bacon"
+        android:id="@+id/baconText"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="39dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="GOTO APPLES"
+        android:id="@+id/BaconButton"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+</RelativeLayout>
+
+***** strings.xml
+Didn't bother to register any.

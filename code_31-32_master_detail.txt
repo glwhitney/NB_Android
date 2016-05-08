@@ -1,5 +1,51 @@
-[source code] Android Development Tutorial - Master Flow
-Not all of these were modified but they are here anyway.
+[source code] Android Development Tutorial 31 and 32 - Master Flow
+
+
+***** Tutorial Notes
+
+Master Detail Flow Template
+//Overview//
+The next tutorials are going to use MasterDetailFlow template to create an app that, when displayed on a tablet, will present a ListView on the left and a Detail fragment on the right. Which fragment will depend on the item selected from the ListView. It is unfortunate that we have not covered a list activity before now, because the concepts of a ListView, Adapter and on ItemSelectedListener will have to be learned along the way.
+
+** 31 - Master Detail Flow
+This will provide a visible menu. For tablets you would choose the template MasterDetailFlow, which has a menu on the left and a fragment on the right. *Note! For a phone you would see 2 screens. We did not do anything special for side by side. When I ran it on a tablet with a 4dp reduction in size it showed both.
+There are several tweaks required because of the new templates. The end result is it works but there is a rendering problem with the Detail Activity some class is missing from the library. Choose to ignore it. The default AppBar is designed to scroll up out of the way but it looks to big when it loads on a phone.
+
+1. Start new project and pick the Master Detail Flow template.
+	a. Object kind is what kind of thing do you want in your menu. Should be a noun that describes the list items. He elected to call it webpage since that is what he is going to display on the right.
+	b. Studio generates 4 classes and 5 layouts in the tutorial but Studio 2.0 generates 4 classes and 6 layouts. NOTE: one of the classes is in the dummy folder.
+	c. Studio Created a helper (notice how everything is declared Static) java class called DummyContent. This is a helper class for the item in the list, which are objects based on the inner DummyItem class.
+
+2. Modify DummyItem so the object will contain an id, a name, and an url.
+	a. Modify the constructor to accept the new parameters
+	b. Set the properties.
+	c. Modify the return
+3. Modify the addItems to reflect the new properties.
+	a. Pick 3 urls from the web or your favorites and name them. NOTE: this will require eliminating the supplied for loop.
+
+** 32 - Master Detail Flow Example
+1. Modify webpage_details.xml
+	a. Delete the default TextView and create a WebView resource NOTE: you can't delete the TextView or drag and drop a WebView widget. You have to do this in the text editor.
+	b. Note the first line is the xml encoding tag, same as the first line in manifest
+2. Modify WebpageDetailFragment.java
+	a. Import webkit.Webview. NOTE: You can delete the TextView import but don't delete any of the other imports.
+	b. Modify onCreateView.
+	c. Remove the TextView that we deleted and add the webView. NOTE: You have to replace content with item_name in the onCreate to set the text for the AppBar Title
+3. Add the Internet Permission request to the manifest.
+
+//Rendering Problems//
+The activity_webpage_detail.xml has a rendering problem. When you run the app the AppBar Layout is large. If you scroll up, it reduces the font to a reasonable size and looks normal.
+The rendering problem is somewhere in detail_toolBar. The Detail Toolbar shows the item_name of the item data e.g. the title we set for the url. The rendering error is due to this detail_toolbar. I created a new Project and didn't change anything. The problem is still there.
+I Googled the paint warning and did not find a solution.
+I tried changing the dimensions but then the text is cut off and only the back button appears.
+
+//Tweaks//
+/Must Fix/
+onBindViewHolder change to holder.mContentView.setText(mValues.get(position).item_name);
+/Optional/
+The main layout "activity_webpage_list.xml" tries to set the tools:context to MainActivity but that is not the name of this activity so change it to WebpageListActivity.
+You can commented out the FAB code and removed the FAB from the layouts.
+
 
 ***** manifest.xml
 <?xml version="1.0" encoding="utf-8"?>

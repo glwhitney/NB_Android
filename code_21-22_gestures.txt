@@ -1,4 +1,32 @@
-[source code] Android Development Tutorial - Gestures
+[source code] Android Development Tutorials 21 and 22 - Gestures
+
+***** Tutorial Notes
+
+** 21 – Gestures
+Touch Gestures include: Scroll, Fling, Double-Tap, and Swipe.
+
+//Layout//
+1. Start with a EmptyActivity and delete Hello World. Add a Large Text with the id buckysMessage. TextView text will change to reflect the state the gesture you perform.
+
+//Java//
+1. Get your imports including android.support.v4.view.GestureDetectorCompat
+2. Activity implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener
+NOTE: Don't change the Activity to ActionBarActivity like Bucky. You will get rendering problems
+
+3. Add variables  for TextView and gestureDetector
+4. Use Alt-Ins to implement all the required methods (below on Create()
+5. In onCreate(), get a ref to TextView and create the gesture object and implement the listener.
+6. Set the actions for the call back methods e.g. buckysMessage.setText("onSingleTapConfirmed"); 
+NOTE: Be sure to return true in event overrides to consume the touch event.
+
+** 22 - Running the Gesture App
+NOTE: V7. ActionBarActivity is a child of support.v4.FragmentActivity, which is a child of Activity
+
+We need one last statement to check touch events for gesture events.
+1. Override Activity onTouchEvent (after Gestures)
+2. Add a line to check for gestures i.e. this.gestureDetector.onTouchEvent(event);
+Run and test the app.
+
 
 ***** manifest.xml
 <?xml version="1.0" encoding="utf-8"?>

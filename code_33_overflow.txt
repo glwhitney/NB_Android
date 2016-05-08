@@ -1,4 +1,38 @@
-[source code] Android Development Tutorial - Overflow
+[source code] Android Development Tutorial 33 - Overflow
+
+***** Tutorial Notes
+** 33 - Overflow Menu
+//Overview//
+The overflow menu appears in the ActionBar as 3 stacked squares. The menu is included when you chose the Basic Activity template. By default, it has one item called settings. Try running the Activity before modifying it to see what happens when you click the overflow menu.
+The goal here is to replace the default Setting menu with 3 coloritems, and change the display background color when you select one. 
+
+//Tutorial//
+NOTE: The overflow menu was not showing up in a new Basic activity, in Design and Preview, but is there in the emulator:
+• It won’t show at all if you don’t have something in menu_main.xml.
+• It won’t show up if the device has a hardware menu button.
+• If you don't even get the App title in the preview, change the theme setting using the Editor tool bar.
+
+NOTE: Bucky uses ActionBarActivity which is depreciated. Use AppCompatActivity instead. This also means that you can't select the Holo or Material themes that he does, without getting rendering errors. Don't worry the Overflow menu will be there when you run your app.
+
+1. Start with a Basic Activity
+	a. Open the context layout
+	b. Delete hello world TextView
+	c. Add a large text.
+	d. Give the Layout and Id so you can reference.
+2. Main_menu.xml has only the settings item by default.
+	a. Delete it because we are not going to use it here.
+	b. Add a <group>
+	c. Add items with new ids
+	d. Change the strings to string references
+3. Main Activity
+	a.  import android widget relative layout
+	b. onOptionsItemSelected delete everything because we are not using the settings menu item
+		i. get a reference to relative layout
+		ii. use a switch to determine which item was selected
+		iii. have default return to insure method returns something.
+
+NOTE: If you didn't import Color you will get errors. Just use Alt-Enter to import it.
+
 
 ***** manifest.xml
 

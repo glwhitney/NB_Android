@@ -1,5 +1,110 @@
 [source code] Android Development Tutorial - Fragments
 
+***** Tutorial Notes
+//Overview//
+Fragments are like mini activities. They have a layout and a class. They are designed to be self-contained so they can be reused. The fragment occupies part of the UI in the activity's layout. You can have multiple fragments in an activity.
+Important! One fragments never talk to another fragment. The talk to the Activity and the Activity can communicate with the other fragment.
+
+This subject takes 8 tutorials to cover. The goal here is to have one activity with a top fragment and a bottom fragment. You type text and click a button, in the top fragment, and the Activity updates the text in the bottom fragment.
+NOTE: These fragments are static in the sense that they are tags in the Activity's layout, as opposed to being added dynamically by the Activity's java. This is important because they cannot be replaced or deleted by java.
+NOTE: A meme is something that gets reposted in viral way.
+TIP! To follow along, with the videos, you can just copy, from below, what is needed at the time.
+
+** 23 - Fragments
+Code file = Code 23-30 Fragments.txt
+1. Start with a Empty Activity not a Blank Activity or a Fragment Activity
+2. Set up the image for the meme
+	a. Switch from Android to Project 
+	b. Empty Activity didn't have a drawable folder
+	i. If you right-click res, you can create a new drawable directory
+	c. Put a square image into the res> drawable folder
+TIP! I went to Facebook grabbed my profile photo and pasted it in Paint. Then saved it in drawable.
+
+** 24 - Designing the Top Fragment
+Fragments have a java class and an xml layout like an activity but fragments have to be part of an activity
+1. Right-Click layout > new layout resource file 
+	a. Name it e.g. top_section_fragment
+	b. Change LinearLayout to RelativeLayout
+2. Open the xml in text mode and add 2 EditView widgets and a button
+3. Make a button_text string resource.
+NOTE: The margins on your widgets will affect how much space is available for the other fragment.
+
+** 25 - Creating the Fragment Class
+1. Add new class TopSectionFragment in package that contains MainActivity. NOTE: If you create the class in the wrong package it will not be able to find R., you can drag the class to the correct package and Studio will refactor it.
+2. Import 5 imports
+3. Extend fragment
+4. Use Alt+Insert to override onCreateView and delete the return statement return super.onCreateView(inflater, container, savedInstanceState); NOTE: Studio adds all the @nullable but you don't need it because it is just annotation. I think it is there to remind you that you can get a null pointer error at runtime.
+5. Inflate your fragment and return the inflated view.
+
+Create bottom layout fragment
+1. Right-Click layout > new layout resource file 
+	a. Name it e.g. bottom_picture_fragment
+	b. Change LinearLayout to RelativeLayout
+2. Add image to background. 
+	a. Tip click 3dots on the property to browse. NOTE: I copied my profile from Facebook and put it in the drawable folder
+	b. NOTE: The image is stretched now but we are going to make the fragment shorter later.
+3. Add 2 large textViews, one to top middle and one to the bottom middle.
+
+** 26 - Finishing the Meme Apps Design
+1. Change the new text widgets
+	a.  color to white #ffffff
+	b. Width to match parent
+	c. Expand gravity to select center horizontal
+	d. Change the default text to Top and Bottom and add the resources to Strings
+2. Create the java for the BottomPictureFragment
+	a. Copy imports from TopSectionFragment
+	b. Extend  the activity to use fragments
+	c. Copy the onCreate and change it to use this fragment
+NOTE: You can also copy and paste java classes and then modify them
+3. Add the fragments to the Activity
+	a. Delete Hello World
+	b. Add Top Fragment – Scroll down Palette to custom
+	c. Rendering problem – click the suggestion @layout/top_section_fragment
+	d. Add Bottom Fragment – Scroll down Palette to custom
+	e. Rendering problem – click the suggestion @layout/bottom picture_fragment
+4. Modify the fragments width and height to 320dp, to make it square. NOTE: your dimensions may vary, to not cover up part of the top_section_fragment.
+
+** 27 - Listening for Button Clicks
+//Overview//
+Fragments never talk to one another. Fragments talk to Activities with a callback event. To do this fragments define an Interface and the Activity implements the interface. The Activity can talk to fragments through a FragmentManager class.
+
+Steps
+• Fragment creates and interface. (tutorial28)
+• Activity will implement the interface (tutorial 29)
+• Button click will call method in Main that was defined in the interface. (tutorial 28)
+
+Top Section Fragment
+1. 3 more imports.
+2. Create references for your widgets but assign them in onCreateView.
+3. Add the button listener in onCreateView. NOTE: This time onClick calls a separate buttonClicked method to implement the code.
+4. Add the buttonClicked method (shell only for now.)
+
+** 28 - Communicating with Main Activity
+The goal of this tutorial is to glue the top fragment to the Main activity with an interface.
+1. In TopSectionFragment create an interface.
+	a. Declare TopSectionListener activityComander;
+	b. Write method public interface TopSectionListener  with 2 String args. NOTE: we will be implement it in Main Activity later.
+2. Override the fragments onAttach method to state what should be done when the fragment is attached to the Main Activity. NOTE: This method is depreciated in support.V4.app.Fragment. Use onAttach(Context context) instead
+3. Add activityCommander to the button clicked method and pass in the fragment text
+	a. activityCommander.createMeme(topTextInput.getText(0.toString(), bottomTextInput.getText(0.toString());
+NOTE: This doesn't seem right. He has the fragment implementing its own interface to respond to onClick. You can simply create the onClick method like you normally do. Except that it calls the method in the MainActivity.
+
+** 29 - Changing the Memes Text
+//Main Activity//
+1. Change Main_Activity to implement TopSectionFragment.TopSectionListener  NOTE: Leave Main extending appCompatibility instead of extends ActionBarActivity. Also there will be an error until we implement the interface method.
+2. Override the createMeme called by the button click in the top section fragment interface. We will compete the method in the next tutorial.
+
+Bottom Fragment
+3. Update bottomActivityFragment so it can update the 2 text Views
+	a. Assign the text Views IDs
+	b. Create private static variables for each TextView
+	c. Assign references in the onCreate
+4. Create a void method that can be called by ActivityMain to change the text
+
+** 30 - Dank Meme Bro
+1. Add create Meme method to Main.
+	a. Get a reference to the bottom fragment i.e. Meme. NOTE:Getting a reference to the fragment is very different because you use getSupportFragmentManager.
+
 ***** manifest.xml
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"

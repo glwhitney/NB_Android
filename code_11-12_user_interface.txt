@@ -1,4 +1,27 @@
-[source code] Android Development Tutorial - User Interface
+[source code] Android Development Tutorials 11 and 12 - User Interface
+
+***** Tutorial Notes
+//User Interface//
+** 11 - Designing the User Interface
+1. Start a new project
+	a.  with no Activity. Note this will display the “No files are open” gray screen.
+	b. Navigate to your app>java>your app and create a new Empty activity. Check Launcher Activity.
+	c. Open manifest to see that Studio added the launcher information.
+2. Delete Hello World 
+3. Add Large Text, email, password, button
+4. Change Large Text’s text property to “Sign In”
+
+** 12 - More on User Interface
+1. Changed button text using text editor to Log In
+2. Added  320 dp width to Edit Views,
+3.  explained that dp is device pixel
+4. replace hard coded String warning
+	a.  by clicking light bulb and extracting resource
+	b. open strings.xml Note I got a “rendering problem” message, just click the refresh icon on the editor toolbar.
+	c. Do the same for the button. Note button displayed the reference instead of the string, so I ran clean project.
+TIP!- Ctrl+ hover over a reference/resource and click - takes you right to the resource.
+Static layout – uses the xml file.
+Dynamic layout - design layout in java.
 
 ***** manifest.xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -12,7 +35,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity">
-            <intent-filter>
+            <intent-filter>Activity States
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />

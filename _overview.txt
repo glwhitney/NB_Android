@@ -1,0 +1,126 @@
+﻿Prologue
+April 16, 2016
+It has been almost a year since I first did the New Boston Android for Beginners tutorials. At that time Android 5 API21 was available and was the same level as Bucky was using to create his tutorials. At this time Android 6 API25 is the latest and Android Studio Version 2.0 is now what you get when you download it.
+/////
+/ The difference between the tutorials and new templates, makes it
+/ difficult for new students to follow along.
+/////
+I have decided to view the tutorials again. This time I am going to save the relevant code, resources and my notes in a text file. One for each topic. The first 8 tutorials don't create any code, so my notes for the first 8 are included here.
+
+***** eBook *****
+Bucky's tutorials appear to follow the chapters in the eBook "Android Studio Development Essentials", by Neil Smyth.  You can get a version on Google Play but to get a PDF version I suggest eBookFrenzy.com their prices are the lowest I have seen.
+
+**** Installation and Testing
+** 01 Introduction
+Bucky is going to use Android Studio to create these tutorials. Initially he will step through the installation process so everyone can learn how that is done.
+1. Installation
+       a. Installs the Java JDK. NOTE: Android Studio installation will now do this for you.
+       b. Pick the version that matches your computer.
+       c. Download and install using default settings
+2. Java Home
+       a. Navigate to the installation and open the JDK directory
+       b. Copy the path
+       c. Create the new environment variable JAVA_HOME and paste the path.
+
+** 02 Installing Android Studio
+1. Google "Android Studio Download"
+2. Click Download
+3. Install accept defaults
+4. Run as Administrator so it can make changes to the computer because it is going to need to install updates, and you are going to want to use the SDK Manager.
+
+//SDK Manager//
+1. Use the SDK Manager to install updates.
+2. Close the manager and Studio so it can use the new updates.
+
+** 03 Setting up Your Project
+//Configuration//
+* Select Start New Project from the Welcome Screen
+* The Application Name should be different for every project because a folder will be created to hold all the files needed to make the project. This is also the Name of the App that appears in the Title when you run the app.
+* The Domain Name combined with the Application Name is what make the app unique on the Google Play Store. Use his suggestion, thenewboston.com, for the company name for all the videos.
+* Form Factors – Use Phone and API 8. Pick a SDK that will run on most devices. Don’t go too far back because the devices may not be in circulation NOTE: Later on, when you want to use new Android features you have to pick an API that supports those features.
+
+//Activity Template//
+This is where following the videos become difficult. Android 5 API21 was before tool bars were the standard. This means you could still extend the AppBarActivity. 
+Bucky tells you to select the Blank Activity template and if you aren't using API21 to develop, your template will not look like Bucky's. API23, and above, Blank Activity includes 2 layouts a toolbar and a floating point icon. None of this is on Bucky's Activity. NOTE: In Studio 2.0 the Blank Activity is now called the Basic Activity.
+
+//Empty Activity//
+Choose Empty Activity, not Blank Activity like the tutorial. This will make it easier to follow along.
+NOTE: The bar at the top is called an App Bar. Bucky's will have 3 vertical stacked squares on the right, and yours won't. They are for an overflow menu. This discrepancy is not important until the Overflow tutorial #23.
+
+**04 - Running a Simple App
+//HAXM//
+Bucky went into the SDK Manager to point out the need for the HAXM accelerator. NOTE: The Forum is constantly getting request with how to make this work.
+• HAXM is for computers that are Intel based.
+• Have a BIOS that can support HAXM.
+• The SDK install may only download it to your computer. If this is the case, you still have to find it and install it.
+
+//Errors//
+You will get errors if you installed Java or Android not where it expects them. Use File>Project Structure> SDK Location to point to the location where you installed them.
+
+//App Theme//
+DON'T Change to Material light so our screen looks like his.
+NOTE: App theme is chosen for you by the template. It is located in the Styles folder. The theme has to work with the type of Activity. For example: If your Activity doesn't use an ActionBar and you pick a theme that does, you will get rendering errors.
+He also removed the phone frame so the image would be a little bigger.
+
+//AVD Manger//
+Bucky demonstrates making a Virtual Device, but use the default. Start the AVD and leave it open so it doesn’t have to build a new device every time you test your app. Run your app to see what it looks like on the emulator.
+The point here is to test your installation. Picking a simple AVD will increase the probability that it will not crash. If you can get past this test you will be good to proceed to writing code.
+NOTE: Studio 2.0 doesn't have a default device, so pick one that doesn't use a lot of memory, like a Nexus 4.
+Tip! If you run an app on one of the default devices, the app is now on that AVD. So it is better to clone one of the defaults. You will do this in tutorial 7.
+
+**05 - Tour of the Interface
+• Menu Bar
+• Tool Bar-short cuts
+• Navigation Bar - file path to current file and you can click on any of the directories to see the content.
+• Editor Window
+• Project Window – Android - condensed view. Project – view all files. App is where your code is. NOTE: Studio 2.0 now has tabs here so you can have more than one view of the project.
+• Quick Window shortcuts in the margins. Square in lower left corner toggles shortcuts. Hover over it to see a popup list.
+
+**06 - Android Studio Tips
+• Help -> Key map short cut references.
+• Files -> Settings Appearance Theme
+• How to change your editor style using the gutter:
+	o  show line numbers.
+	o Code Folding Editor
+• File -> Settings> Editor > General -> Code Folding
+
+//Project Deletion//
+The correct way to delete a project is:
+1. Project Explorer -> Project Files -> app ->. App
+2. Right click the nested app folder and select delete.
+3. File -> Close Project
+4. Use Windows Explorer to delete the folder where you were storing the app.
+5. Next time you open Studio the app will be gone from the welcome screen.
+
+07 - Create a Custom AVD
+1. Clone an existing and name it.
+2. Don’t change hardware configuration to make sure your device is going to run. (See note below)
+3. Bucky says to select the latest System Image i.e. version of android. I suggest picking the same as his which is API21. Pick an x86 if you want to use HAXM.
+	a. Scale– 4 dp is good. This step isn't necessary with Studion 2.0, because you can resize the AVD window.
+	b. Use Host GPU. NOTE: Don't do this if you can't use HAXM to speed up the graphics. Use the Snapshot.
+4. NOTE: Studio 2.0 doesn't have a default device, so I picked a Nexus 4 to clone. Then I turned off cameras and sensors features that I wasn't going to use. It said my HAXM was out of date. (Studio 2.0 has new AVD generation) so I updated that. I also choose API21 x86_64 with 2GB which is a lot but I have 32GB RAM. I also choose an Android System Image instead of Google to be as compatible to Bucky's as I could. (Google APIs allow testing on Google Play Services). He chose a Goggle System Image during this tutorial but didn't save the AVD.
+TIP! You need the Accelerometer for state changes to recognize the change of orientation.
+
+**08 - Basic Overview of an App
+Studio creates all the files need for your app. Important! If you chose the Blank Activity template and you have a floating icon in your layout, Stop and close the project. Create a new project and use the Empty Activity Template.
+For now, you need to only know about 3 files.
+1. Manifest.xml is created for you and manages what is in your project.
+2. Activity_main.xml contains the layout for your screen, similar to. HTML for a webpage.
+a. NOTE: Later, there are few tutorials where the layout is generated in the java.
+3. MainActivity.java contains the code to run, similar to. JavaScript for a webpage.
+a. The only method you need to be concerned with, at this time, is 
+b. protected void onCreate(Bundle savedInstanceState) {
+c. This is the starting place for initializing the Activity.
+
+Design tab is drag and drop. Text tab is the code editor window.
+
+//Design View//
+• Delete Hello World Text View. NOTE: The tag also disappears from the Text tab.
+• You drag and drop widgets from the palette, then change their properties to customize them.
+• Tip! If you don't see the preview when you select the Text Tab, then click the Preview Tool in the right margin.
+• Can use Component Tree, on right, to select widgets.
+
+//Manifest//
+Whenever you are looking at a new app you can open the manifest.xml to see what activities are used and which one is the starting place i.e. Launcher.
+
+From this point forward. Each of my code files will include its own notes.
