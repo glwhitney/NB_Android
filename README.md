@@ -1,7 +1,7 @@
 #Welcome and Purpose
 This GitHub repository is owned by Gary Whitney and is not affiliated with TheNewBoston.com or Bucky Roberts.
 I simply felt like sharing my code and notes about the Android Beginners Tutorials.
-The notes are in a Word document and the code is in text documents.
+The notes are embedded in the code files.
 ##Android Studio Version
 This code was written using Android Studio 2.0.  This is important because the Blank Activity is now call the Basic Activity.
 ##Android Version 6
