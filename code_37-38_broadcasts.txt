@@ -1,0 +1,147 @@
+Android Development Tutorial 37 and 38 - Broadcasting
+
+***** Tutorial Notes
+//Overview//
+The goal here is to have one visible Activity send a broadcast Intent. Have a second invisible Activity receive the broadcast and post a Toast to acknowledge it consumed the intent. The UI is simply a Button that will use sendOutBroadcast() method, of the Activity class, to  send a broadcast intent. The mechanism that ties the sender and receiver together is the <intent-filter> <action> elements in the Manifest files.
+
+NOTE: There are other broadcast methods like sendStickyBroadcast() or sendOrderedBroadcast(), that you can read about at http://developer.android.com/reference/android/content/Intent.html
+
+//Tutorials//
+** 37 - Sending Broadcast Intents
+1. Start a new project named SendBroadcast
+	a. Use the Empty Activity template
+	b. Delete Hello World 
+	c. Add Button, onClick = sendOutBroadcast
+TIP! When setting properties in design view, click on the Properties toolbar and start typing, a hidden search box appears.
+2. Main.java
+	a. Import Intent and View
+	b. Create sendOutBroadcast()
+		i. Create implicit intent.
+
+** 38 - Receiving Broadcast Intents
+1. Start a new project, pick No Activity. NOTE: This generates the “NoFiles” gray screen.
+2. Create a New>Other>Broadcast Receiver
+	a. Name ReceiveBroadcast, with both Exported and Enabled options are selected.
+NOTE: These settings allow the Android system to launch the receiver when needed and ensure that the class can receive messages sent by other applications on the device.
+	b. Import Toast
+	c. Make a Toast in the onReceive()
+	3. Add an intent action filter, for the Receive activity, to the manifest.
+4. First run the Receive activity but deselect launch default activity.
+
+NOTE: I received the error "Could not identify launch activity: Default Activity not found". while Launching activity. Studio 2.0 did not popup the edit configurations when I clicked the Run icon. Instead I had to use the Run… on the Run Menu.
+
+5. Now run the Send Broadcast Activity.
+6. Test the applications.
+
+///// Send Activity
+***** manifest.xml
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.thenewboston.sendbroadcast">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>
+
+***** MainActivity.java
+package com.thenewboston.sendbroadcast;
+
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.content.Intent;
+import android.view.View;
+
+public class MainActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+    }
+
+    public void sendOutBroadcast(View view){
+        Intent i = new Intent();// no explicit class like last tutorial
+        i.setAction("com.thenewboston.sendbroadcast");// use package as a unique identifier.
+        i.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES); // for all versions of android
+        sendBroadcast(i);
+    }
+}
+
+***** activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.thenewboston.sendbroadcast.MainActivity">
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SEND BROADCAST"
+        android:id="@+id/sendButton"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:onClick="sendOutBroadcast"
+        android:nestedScrollingEnabled="false" />
+</RelativeLayout>
+
+///// ReceiveActivity
+***** manifest.xml
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.thenewboston.receivebroadcast">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <receiver
+            android:name=".ReceiveBroadcast"
+            android:enabled="true"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="com.thenewboston.sendbroadcast">.</action>
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>
+
+***** ReceiveBroadcast.java
+package com.thenewboston.receivebroadcast;
+
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.widget.Toast;
+
+public class ReceiveBroadcast extends BroadcastReceiver {
+    public ReceiveBroadcast() {
+    }
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        Toast.makeText(context,"Broadcast has been received",Toast.LENGTH_LONG).show();
+    }
+}
+
+

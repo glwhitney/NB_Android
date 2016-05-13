@@ -1,0 +1,177 @@
+Android Development Tutorial 41 - Intent Service
+
+***** Tutorial Notes
+Services
+//Overview//
+The Tread in the last tutorial was an independent process. It used the Android Message Service to trigger Handler in the Activity process. No Data was passed and the handleMsg() method did the updating of the UI.
+
+The next tutorials are going to use a sub class of the Service class, called the Intent Service. This is one of the easiest services to implement because it doesn't require a lot of code. The purpose of the IntentService class is to provide the developer with a convenient mechanism for creating services that perform tasks asynchronously within a separate thread from the calling application.
+
+An Intent Service doesn’t have a UI. It runs on a thread, in the background and is attached to the Activity that started it. We are going to use a LOG message to demonstrate that the Intent is working.
+
+You need an Activity that you can interact with to demonstrate that the Intent Service doesn't impact the UI. Bucky chose to reuse his Apples, Bacon Activities, which is using an Intent to start the second activity. I thought this would be confusing so I created a new Activity with a simple Toggle Button on the interface. 
+
+** 41 - Intent Service
+IntentServices are easy to implement because they create the Runable and Thread from the onHandleIntent method.
+
+I am going to deviate from Bucky's code here because when I added the onDestroy to his IntentService, I discovered that the IntentService was destroyed after it completed the task of one log statement. Since the purpose was to show that you could interact with the UI while the IntentService was running, the simple task defeated the purpose. The service was over before you could interact with the UI. I extended the time the IntentService runs by adding a for loop and a wait method.
+
+//Tutorial//
+1. New Empty Activity
+	a. Delete Hello TextView and add a Toggle Button
+	b. Note: 5/11/16 API23 N Preview has rendering problems with the Toggle Button. Switch to API23. Already reported several times by others.
+	c. For this demonstration you don't have to do anything Activity Main. Java. But I included and commented out what you would need to respond to the button clicks.
+
+2. Add a new java class
+	a. Name it BuckysIntentService
+	b. Make it extend IntentService.
+Note: There is a template available for an IntentService. But we are not using it.
+
+	c. Used Alt-Insert to create the constructor
+	d. Used Alt-Insert to create onHandelIntent() method. This is where you define what the service should do.
+	e. Create Log Tag and use it in onHandelIntent to log that the IntentService did run.
+Note: This is where I added the code to extend the time the service runs.
+
+Tip! Don't override the IntentService onCreate() method. You will get a null pointer exception.
+3. Register the service in Manifest by using the Service Tag.
+4. Put the code to start the Intent in MainActivity.java, onCreate().
+5. Run the App and you will be able to click the Toggle Button while the Intent Service is running.
+
+***** manifest.xml
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.thenewboston.intentservicetest">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <service android:name=".BuckysIntentService" />
+    </application>
+
+</manifest>
+
+***** MainActivity.java
+package com.thenewboston.intentservicetest;
+
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+//import android.widget.CompoundButton;
+//import android.widget.ToggleButton;
+import android.content.Intent;
+
+public class MainActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+       Intent intent = new Intent(this,BuckysIntentService.class);
+        startService(intent);
+
+
+/*        ToggleButton toggle = (ToggleButton) findViewById(R.id.toggleButton);
+
+        toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    // The toggle is enabled
+                    // Do Something
+                } else {
+                    // The toggle is disabled
+                    // Do Something
+                }
+            }
+        });
+ */
+
+    }
+}
+
+***** activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="com.thenewboston.intentservicetest.MainActivity">
+
+    <ToggleButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textOff="@string/tglOffText"
+        android:textOn="@string/tglOnText"
+        android:id="@+id/toggleButton"
+        android:layout_marginTop="71dp"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+</RelativeLayout>
+
+***** BuckysIntentService.java
+package com.thenewboston.intentservicetest;
+
+import android.app.IntentService;
+import android.content.Intent;
+import android.util.Log;
+
+
+/**
+ * Created by Gary on 5/11/2016.
+ */
+public class BuckysIntentService extends IntentService {
+    public static final String TAG = "MyServiceLog";
+    public BuckysIntentService() {
+        super("BuckysIntentService");
+    }
+
+    @Override
+    protected void onHandleIntent(Intent intent) {
+        // this is what the service does.
+        Log.i(TAG,"BuckysIntentService now started.");
+        for (int i = 0; i < 5; i++) {
+            long futureTime = (System.currentTimeMillis() + 5000);// 5 sec
+
+            while (System.currentTimeMillis() < futureTime) {
+                // Don't need to sync when you are not using a thread e,g, Tutorial 39
+                synchronized (this) {
+                    try {
+                        wait(futureTime - System.currentTimeMillis());
+                        Log.i(TAG, "L41 loop "+ i + " finished");
+                    } catch (Exception e) {
+                        //not printing stack trace
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+       // super.onDestroy();
+        Log.i(TAG, "Bucky's Intent Service Destroyed");
+    }
+
+}
+
+***** strings.xml
+<resources>
+    <string name="app_name">IntentServiceTest</string>
+    <string name="tglOffText">OFF</string>
+    <string name="tglOnText">ON</string>
+</resources>

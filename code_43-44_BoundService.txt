@@ -1,0 +1,216 @@
+Android Development Tutorials 42 and 43 - BoundService
+
+***** Tutorial Notes
+//Overview//
+Bound service improve communication between the app and the service. Here we are going to make a service to get the time when the user clicks a button, and update a textView. The key here is our service is going to update the UI TextView with data provided by the bound Service. The other services just wrote to logcat but this Activity can call methods in the service. Granted we could have written a get time in our activity but that would not demonstrate calling a method in the service.
+
+//NOTES//
+1. The tutorial didn't talk about local bound services and remote bound services. Probably because the topic is confusing enough. We are going to create a local bound service, where the Service and the client that uses it are in the same App.
+2. The Service Class reminds me of a Singleton Pattern, which is used when making a class that you only want to instantiate once. This is done by the class having a method that creates one and only one object. You wouldn't want multiple copies of the same service. Instead you want one Service that the client can bind to. Keep this in mind while watching the tutorial.
+3. The eBook offers this succinct summary.
+In general terms, the service’s onBind() method returns an IBinder object containing a reference to the instance of the running service. The client component implements a ServiceConnection subclass containing callback methods that are called when the service is connected and disconnected. The former method is passed the IBinder object returned by the onBind() method allowing public methods within the service to be called.
+Optional: I added log messages to MyService so I could see what gets called when.
+
+//Tutorials//
+** 43 - Bound Services
+
+1. Start a new Empty Activity App and delete Hello World, Add a large Text and a Button.
+	a. Change IDs and text
+	b. Assign an onClick method to the button
+2. My Service - Create a new Service using the Service template and name it MyService.
+	a. Add the 4 imports you are going to use.
+	b. Declare a reference to an IBinder Class.
+	c. Create the IBinder Class that will return a reference to the service.
+	d. Modify the onBind method. 
+		i. Replace the TODO template code with return buckysBinder ; i.e. the reference from step 
+	e. Add what you want the service to do. E.g. get Current time. Get date and format it to HH:MM:SS
+
+** 44 – Bound Services Example
+Whenever you want to bind to a service, you need a Bind service class and methods for what to do when binding and unbinding.
+1. MainActivity – Modify MainActivity so it can make a ServiceConnection and use the Service.
+	a. Do Imports
+	b. Declare references
+	c. Rule 1: Create a ServiceConnection Class that extends Binder
+	d. Define your final IBinder object reference e.g. buckysBinder.
+	e. Write the inner class that is going to do the binding, after the IBinder template.
+
+NOTE: The MainActivity wants to bind to MyService but you can't simply make an object from MyService. You have to call the onBind method in MyService which returns a reference to the Service.
+2. Do 9 Imports. NOTE you need a fully qualified path to your binder class.
+3. Declare the Service class and an isBound variable at the top of your Activity.
+4. Define an inner class ServiceConnection and the required 2 methods that state what you want to do when the client connects and when the client disconnects.
+	a. private ServiceConnection theConnection = new ServiceConnection() {
+	b. onServiceConnected()
+		i. get a ref to the binder class and call the bind method.
+		ii. Set isBound to true
+	c. onServiceDisconnected()
+		i. Set IsBound to false
+5. Create your Intent in the Main Activity on create BUT use bindService instead of startService.
+6. Now implement the onClick method to show the time
+
+
+***** manifest.xml
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.thenewboston.boundservicetest">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name=".MyService"
+            android:enabled="true"
+            android:exported="true"></service>
+    </application>
+
+</manifest>
+
+***** MainActivity.java
+package com.thenewboston.boundservicetest;
+
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
+import android.os.IBinder;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ComponentName;
+import android.content.ServiceConnection;
+import com.thenewboston.boundservicetest.MyService.MyLocalBinder;
+import android.util.Log;
+
+public class MainActivity extends AppCompatActivity {
+    public static final String TAG = "MyServiceLog";
+    MyService buckysService;
+    boolean isBound = false;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        Intent i = new Intent(this, MyService.class);
+        bindService(i, buckysConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    private ServiceConnection buckysConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            // get a ref to the binder class and call the bind method
+            MyLocalBinder binder = (MyLocalBinder) service;
+            buckysService = binder.getService();
+            isBound = true;
+            Log.i(TAG, "Inside MainActivity ServiceConnection onServiceConnected.");
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            isBound = false;
+            Log.i(TAG, "Inside MainActivity ServiceConnection onServiceDisconnected.");
+        }
+    };
+
+    public void showTime(View view) {
+        Log.i(TAG, "MainActivity inside ShowTime");
+        String currentTime = buckysService.getCurrentTime();
+        TextView tvShowTime = (TextView) findViewById(R.id.buckysText);
+        tvShowTime.setText(currentTime);
+    }
+
+}
+
+***** activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.thenewboston.boundservicetest.MainActivity">
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Large Text"
+        android:id="@+id/buckysText"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="61dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="What&apos;s the time?"
+        android:id="@+id/buckysButton"
+        android:layout_below="@+id/buckysText"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="83dp"
+        android:onClick="showTime"
+        android:nestedScrollingEnabled="true" />
+</RelativeLayout>
+
+***** MyService.java
+package com.thenewboston.boundservicetest;
+
+import android.app.Service;
+import android.content.Intent;
+import android.os.IBinder;
+import android.os.Binder;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import android.util.Log;
+
+public class MyService extends Service {
+    public static final String TAG = "MyServiceLog";
+    private final IBinder buckysBinder = new MyLocalBinder();
+
+    public MyService() {
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        Log.i(TAG, "Inside MyService IBinder onBind method");
+        return buckysBinder;
+    }
+
+    public class MyLocalBinder extends Binder {
+        MyService getService(){
+            Log.i(TAG,"Inside MyService MyLocalBinder getService()");
+            return MyService.this;
+        }
+    }
+
+    public String getCurrentTime(){
+        Log.i(TAG, "Inside MyService getTime()");
+        SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss", Locale.US);
+        return (df.format(new Date()));
+    }
+    //Optional
+    @Override
+    public void onCreate() {
+        Log.i(TAG, "Inside MyService onCreate");
+    }
+
+    // not going to see this one because the Service will exist as long as the Client exits.
+    @Override
+    public void onDestroy() {
+        Log.i(TAG,"Inside MyService onDestroy");
+    }
+}
+
