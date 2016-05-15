@@ -1,0 +1,213 @@
+Android Development Tutorials 45 thru 48 - ListViews
+
+***** Tutorial Notes
+** 45 - ListView
+Start a new Empty Activity App and delete Hello World. Add a ListView.
+
+NOTE: Bucky extends Activity because he doesn't want an ActionBar in his layout. I tried this and it made no difference because the theme defined in styles.xml was Theme.AppCompat.Light.DarkActionBar. Leave the extends AppCompatActivity and change the theme toTheme.AppCompat.Light.NoActionBar.
+
+1. Layout
+	a. Delete the TextView and add a ListView.
+	b.  Set the width and height to match_Parent
+	c. Give it the ID buckysListView
+2. Main.java
+	a. Import 5 items
+	b. in on create make an array of foods
+	c. started to make a ListAdapter using an Array Adapter to take the array foods[] and map it to the ListView.
+
+** 46 - ListView Example
+1. Make a ListAdapter using an ArrayAdapter(content, format, array)
+2. Get a ref to the ListVview
+3. setAdapter(the adapter)
+4. Run the app, the list appears but doesn’t respond to clicks.
+5. setItemClickListener
+6. get the value of the selected item using parent and position
+7. make a toast.
+NOTE: If you rapidly click multiple items, the Toasts are queued.
+
+** 47 - Custom ListView Row
+In the last tutorial we used a built-in layout for the row items. In this one we are going to make a custom layout. Here we are going to use the same image every time but we are going to change the text to the right of it. If you were going to have different images you would need to create an array of image ids and coordinate with the text array.
+
+1. Keep using the App from the last tutorial. Make a new layout called custom_row.
+2. Grab and image from internet of at least 100 x100 
+	a. Store it in drawable-hdpi // I stored mine in drawable.
+	NOTE: Studio 2.0 doesn't make all those drawable folders for different resolutions. So just drop the image in drawable.
+	Tip! Go to the android forum and copy Bucky's image, then paste it into Paint and save it in drawable.
+3. Create a new xml for the rows and use a linear layout
+	a. Change the linear layout orientation to horizontal i.e. left to right
+	b. add an imageView and set it's src attribute, without the file extension.
+	c. add a largeText with the id buckysText
+	d. give them both some padding 5 dp
+
+** 48 - Custom ListView Adapter
+Now we need a custom adapter for our custom list item , to replace the one we used last time used android.R.layout.simple_list_item_1 
+
+1. Create a new (non public) class that extends arrayAdapter<String>
+	a. Use Alt-Insert for the constructor template 
+NOTE: Bucky is making a custom constructor using a 2 parameters template but is actually passing 3 parameters to the Super. Tip! Select the constructor with 3 parameters and object [] is the last parameter.
+
+	b. Context context means the current context i.e. App environment.
+	c. Replace the second parameter with a String array called foods.
+	d. Replace resource argument in the call to super with R.layout.custom_row
+	e. Replace array argument in the call to super with foods
+2. Now tell it what view to use by overriding getView() and deleting the default return
+	a. Inflate the custom_view layout.
+	b. Get references to the custom row views
+		i. Get a ref to a single food Item using the position.
+		ii. Get a ref, custom layout TextView 
+		iii. Get a ref to custom layout image. Note: I didn't bother to change the default ID.
+	c. Set the text and the image for the custom row
+	d. Return the custom view
+3. Change the List Adapter in MainActivity.java to use the new Custom Adapter class.
+4. Run the App with the new custom row.
+
+NOTE: If you want to have a different image for each row. After looking at the constructors available for ArrayAdapter, I think you will need to:
+1. add more images to drawable
+2. Create a new object that holds both the image and the text
+3. Create an array of those objects to pass to Custom View.
+
+***** manifest.xml
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.thenewboston.listexample">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
+
+***** MainActivity.java
+package com.thenewboston.listexample;
+
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.Toast;
+
+public class MainActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        String[] foods = {"Bacon", "Ham", "Tuna", "Candy", "Meatball", "Potato"};
+        /* Tutorial 46
+        ListAdapter buckysAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, foods);
+         */
+        ListAdapter buckysAdapter = new CustomAdapter(this,foods);// Pass the food array to the constructor.
+        ListView buckysListView = (ListView) findViewById(R.id.buckysListView);
+        buckysListView.setAdapter(buckysAdapter);
+
+        buckysListView.setOnItemClickListener(
+                new AdapterView.OnItemClickListener(){
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        String food = String.valueOf(parent.getItemAtPosition(position));// parent is the ListView
+                        Toast.makeText(MainActivity.this, food, Toast.LENGTH_LONG).show();
+                    }
+                }
+        );
+    }
+}
+
+***** activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.thenewboston.listexample.MainActivity">
+
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/buckysListView"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+</RelativeLayout>
+
+***** CustomAdapter.java
+package com.thenewboston.listexample;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+/**
+ * Created by Gary on 5/15/2016.
+ */
+ class CustomAdapter extends ArrayAdapter<String> {
+    public CustomAdapter(Context context, String[] foods) {
+        super(context,R.layout.custom_row, foods);
+
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        // default -  return super.getView(position, convertView, parent);
+        // add the layout
+        LayoutInflater buckysInflater = LayoutInflater.from(getContext());
+        View customView = buckysInflater.inflate(R.layout.custom_row, parent, false);
+        // get references.
+        String singleFoodItem = getItem(position);
+        TextView itemText = (TextView) customView.findViewById(R.id.buckysText);
+        ImageView buckysImage = (ImageView) customView.findViewById(R.id.imageView);
+
+        // dynamically update the text from the array
+        itemText.setText(singleFoodItem);
+        // using the same image every time
+        buckysImage.setImageResource(R.drawable.chuncky);
+        // Now we can finally return our custom View or custom item
+        return customView;
+    }
+
+}
+
+
+***** custom_row.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:id="@+id/imageView"
+        android:src="@drawable/chuncky"
+        android:layout_margin="5dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Large Text"
+        android:id="@+id/buckysText"
+        android:layout_margin="5dp" />
+</LinearLayout>
