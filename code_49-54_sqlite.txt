@@ -1,0 +1,335 @@
+Android Development Tutorial 49-54 - SQLite
+
+***** Tutorial Notes
+//Overview//
+SQLite is a Relational Data Base Management System (RDBMS), that is built into your cellphone. Apps can use this system to store and share data. Sharing requires a <provider> attribute in the manifest.
+
+We are only going to create a simple local database to store one value i.e. the product name for a list of products. Every SQLite database on the cellphone is local and private to the app that creates it. You can't look at the data with a file explorer. You either have to use a SQLite Database Helper or an adb shell session. The latter is covered in the eBook.
+
+SQL is a language for creating and maintaining databases. Most databases consist of several related tables to hold different types of data and link tables to define ways they are related. SQL defines statements for performing common database actions. It is important to note that SQLite does provide a method for executing SQL Statements but it also provides several other wrapper methods for doing the same thing. It does this because construction an error free query with where clauses can be quite challenging. This variety of methods, can lead to some confusion if you choose to mix the methods or see them in other sources. 
+
+The UI for these tutorials is an EditText field to input product names, an Add button, a Delete button, and a TextView to display results of adding and deleting. A more complex database might use a ListView, with a CursorAdapter, to display data.
+
+//Tutorials//
+** 49 - Saving Data with SQLite
+
+Create a new app called SQLiteSample and start with an Empty Activity.
+
+//Activity_main.xml//
+1. Delete Hello
+2. Add a Plain Text Input, Width 300 dp and id = buckysInput
+3. Add Button id = add_Button, addButtonClicked
+4. Delete Button id = delete_Button, deleteButtonClicked
+5. Add a Large Text in the middle of the screen, id = buckysText
+
+NOTE: If buckysText is set to CenterVertical text will fill upward as well as downward.
+
+** 50 - SQLite Database Product
+Our Database is about store products. Each record is represented by a Product object. Therefore, each column is a property of the object. You need a SQLiteOpenHelper to create and update your database and you need 3 things:
+	* A constructor
+	* OnCreate() to create your tables
+	* onUpgrade() to define what to do when a new version of the database exists.
+
+//Products.java//
+1. Create a new Products class to represent product objects, which is what we want to store in our SQLite database table. You will need a property for each column in the table. This table is very simple it only has two columns. You also need a constructor, and getters and setters for the properties. Note: First column in SQLite is always int _id.
+	a. Create a constructor that takes a String productName and sets the property _productname.
+	b. Use Alt-Ins to insert Getters and Setters (outside the constructor).
+
+** 51 - Creating a New SQLite Database
+	c. Added an empty constructor, to Products, in case you don't know the name at the time you create the object.
+
+//MyDBHelper//
+1. Create a new DBHandler class that extends SQLiteOpenHelper
+	a. Add 5 imports
+	b. Add Constants for the Database and the Table.
+NOTE: The first 4 constants seem to be a standard. Also, you would change the version if you modified the schema for the table e.g. added another column or another table.
+	c. Use Alt-Insert to add a constructor and override the 2 required methods. These methods use SQL queries: 
+		i. onCreate() // This only runs when the database doesn't exist
+		ii. onUpgrade() //ONLY runs when you change the version number.
+
+** 52 - Adding and Deleting Rows
+1. Finish on update from last lesson so it drops the table and calls onCreate().
+
+NOTES
+	* ContentValues class is a key Value Map, similar to a Bundle.
+	* Each of the following methods uses the SQLiteHelper to:
+		* Get a writable access to the database
+		* Call a built-in method to do the inserting, deleting.
+		* Closes the database when it completes its action.
+	* You can write quieries inside db.executeSQL or define a query as a String and use the String in the db.executeSQL method. 
+
+TIP! For really complex queries I sometimes break the parts of the query into separate Strings.
+
+2. Add Method – the addButtonClicked will call this
+	a. Create addProduct(Product Object) Pass a product object to get data from.
+Note: SQLite will add the _ID, so we only have one column to add to the ContentValues class.
+		i.  put(colName, getProductName)
+		ii. getWritable db
+		iii. Use db.insert() (CtrlQ) shows the documentation
+3. Delete Method - deleteProduct()
+	a. This time executeSQL(write Delete query, with a whereClause.
+Notice that the value for the where clause is an embedded string.)
+
+** 53 - Printing Database Results
+Print out all the products, since the db is small, by making one long string, and put it in the buckysText.
+1. Create public string databaseToString()
+	a. Select * (WHERE 1 is the same as WHERE 1=1. They are both result in a Boolean True. I just left it out since it has no effect on the results.)
+	b. Create cursor, movetofirst
+	c. While not after last
+	d. if not null for loop to append the strings
+
+We still need to make the main activity interact without database
+
+NOTE: To get data out of a table, you first query the database. The results of the query is a subset of the table, based on the where clause and the requested columns. There are separate methods for getting the data out of the results, that depend on the type of data in each column. You reference the columns by indices. While it is possible to reference columns using the index directly e.g. getString(1) it is better to use the getColumnIndex method because the position of the column varies depending on which columns were retrieved.
+The following are all equivelant:
+	* dbString += recordSet.getString(1)); // Column 0 would be _id
+	* dbString += recordSet.getString(recordSet.getColumnIndex(COLUMN_PRODUCTNAME));
+	* dbString += recordSet.getString(recordSet.getColumnIndex("productname"));
+
+** 54 - Testing the SQLite App
+//Main Activity//
+1. Add Imports
+2. Get Refs to all the Widgets
+3. onCreate()
+	a. Set refs
+	b. Get the dbHandler(4 params) can pass nulls because of the constants. The 1 one the end is the version number.
+4. Create 3 methods
+	a. Create Add Click method
+	b. Create Delete Click method
+	c. printDb to printout the recordset.
+Note I added an if to let you know when the table is empty.
+
+5. Test the app.
+	a. Run the app and add some data.
+	b. Close the App and the AVD.
+	c. Run the App again and the data persists.
+	d. Delete some but not all the data.
+	e. Increase the Version Number to 2 and run the app again
+		i. All data will be gone.
+	f. Decrease the Version number and run again. 
+		i. The app can't load.
+	g. Optional. Add the onDowngrade method.
+		i. Run the app App closes because the call to super throws and exception
+		ii. Replace the call to super with the onUpgrade code.
+		iii. Run the App again. The data is gone.
+
+//Summary//
+This is a very basic introduction to SQLite. The database consists of one table with 2 columns. The Table is not seeded from a file, class, or external source. All the data is created with user input. There are no methods to insure that the data is not duplicated, or that empty strings are not entered.
+
+To learn more about SQL I suggest w3schools website. To learn more about SQLite on Android, I suggest the Android Developers Guide.
+
+If you are just looking to store just a few variables between sessions, I recommend Shared Preferences.
+
+***** manifest.xml  // Nothing new here.
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.thenewboston.sqlitesample">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
+***** MainActivity.java
+package com.thenewboston.sqlitesample;
+
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
+
+public class MainActivity extends AppCompatActivity {
+    EditText buckysInput;
+    TextView buckysText;
+    MyDBHandler dbHandler;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        buckysInput = (EditText) findViewById(R.id.buckysInput);
+        buckysText = (TextView) findViewById(R.id.buckysText);
+        /* Can pass nulls because of the constants in the helper.
+         * the 1 means version 1 so don't run update.
+         */
+        dbHandler = new MyDBHandler(this, null, null, 1);
+        printDatabase();
+    }
+
+    //Print the database If added by GLW
+    public void printDatabase(){
+        String dbString = dbHandler.databaseToString();
+        if (dbString.equals("")){
+            buckysText.setText("Table is empty.");
+        }else{
+            buckysText.setText(dbString);
+        }
+        buckysInput.setText("");
+    }
+
+    //add your elements onclick methods.
+    //Add a product to the database
+    public void addButtonClicked(View view){
+        // dbHandler.add needs an object parameter.
+        Products product = new Products(buckysInput.getText().toString());
+        dbHandler.addProduct(product);
+        printDatabase();
+    }
+
+    //Delete items
+    public void deleteButtonClicked(View view){
+        // dbHandler delete needs string to find in the db
+        String inputText = buckysInput.getText().toString();
+        dbHandler.deleteProduct(inputText);
+        printDatabase();
+    }
+}
+
+***** activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.thenewboston.sqlitesample.MainActivity">
+
+    <EditText
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/buckysInput"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="49dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add"
+        android:id="@+id/addButton"
+        android:layout_below="@+id/buckysInput"
+        android:layout_alignLeft="@+id/buckysInput"
+        android:layout_alignStart="@+id/buckysInput"
+        android:layout_marginTop="41dp"
+        android:onClick="addButtonClicked" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Delete"
+        android:id="@+id/deleteButton"
+        android:layout_alignBottom="@+id/addButton"
+        android:layout_alignRight="@+id/buckysInput"
+        android:layout_alignEnd="@+id/buckysInput"
+        android:onClick="deleteButtonClicked" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Large Text"
+        android:id="@+id/buckysText"
+        android:layout_below="@+id/addButton"
+        android:layout_centerHorizontal="true" />
+</RelativeLayout>
+
+***** MyDBHandler.java
+package com.thenewboston.sqlitesample;
+
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.database.Cursor;
+import android.content.Context;
+import android.content.ContentValues;
+/**
+ * Created by Gary on 5/15/2016.
+ * This class handles all the database activities
+ */
+public class MyDBHandler extends SQLiteOpenHelper{
+    private static final int DATABASE_VERSION = 1;
+    private static final String DATABASE_NAME = "products.db";
+    public static final String TABLE_PRODUCTS = "products";
+    public static final String COLUMN_ID = "_id";
+    public static final String COLUMN_PRODUCTNAME = "productname";
+
+    //We need to pass database information along to superclass
+    public MyDBHandler(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
+        super(context, DATABASE_NAME, factory, DATABASE_VERSION);
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        String query = "CREATE TABLE " + TABLE_PRODUCTS + "(" +
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_PRODUCTNAME + " TEXT " +
+                ");";
+        db.execSQL(query);
+    }
+    //Lesson 51
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PRODUCTS);
+        onCreate(db);
+    }
+
+    @Override
+    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PRODUCTS);
+        onCreate(db);
+    }
+
+    //Add a new row to the database
+    public void addProduct(Products product){
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_PRODUCTNAME, product.get_productname());
+        SQLiteDatabase db = getWritableDatabase();
+        db.insert(TABLE_PRODUCTS, null, values);
+        db.close();
+    }
+
+    //Delete a product from the database
+    public void deleteProduct(String productName){
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL("DELETE FROM " + TABLE_PRODUCTS + " WHERE " + COLUMN_PRODUCTNAME + "=\"" + productName + "\";");
+    }
+
+    // this is going in buckysText in the UI.
+    public String databaseToString(){
+        String dbString = "";
+        SQLiteDatabase db = getWritableDatabase();
+        String query = "SELECT * FROM " + TABLE_PRODUCTS;
+
+        //Cursor is an object that contains the results of a query and has methods for moving a pointer to different rows in the results.
+        Cursor recordSet = db.rawQuery(query, null);
+        //Move to the first row in your results
+        recordSet.moveToFirst();
+
+        //Step through the results and append the product names to our string
+        while (!recordSet.isAfterLast()) {
+            // null could happen if we don't have any records in the table.
+            if (recordSet.getString(recordSet.getColumnIndex("productname")) != null) {
+                dbString += recordSet.getString(recordSet.getColumnIndex("productname"));
+                dbString += "\n";
+            }
+            recordSet.moveToNext();
+        }
+        db.close();
+        return dbString;
+    }
+}
